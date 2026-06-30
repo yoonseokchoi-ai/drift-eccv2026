@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DRIFT: Difficulty-aware Rectified Flows for Through-plane MRI Super-Resolution</title>
+  <meta name="description" content="DRIFT — Difficulty-aware Rectified Flows for Through-plane MRI Super-Resolution.">
+  <meta property="og:title" content="DRIFT: Difficulty-aware Rectified Flows for Through-plane MRI Super-Resolution"/>
+  <meta property="og:description" content="Difficulty-aware rectified flows for through-plane MRI super-resolution."/>
+  <meta property="og:image" content="static/images/fig_drift_test_concept.png"/>
+  <meta name="twitter:card" content="summary_large_image">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/style.css">
+  <script defer src="static/js/app.js"></script>
+</head>
+<body>
+
+  <!-- ===== NAV ===== -->
+  <nav class="topnav">
+    <div class="container">
+      <span class="brand">DRIFT</span>
+      <span class="links">
+        <a href="#abstract">Abstract</a>
+        <a href="#method">Method</a>
+        <a href="#demo">Demo</a>
+        <a href="#compare">Compare</a>
+        <a href="#results">Results</a>
+        <a href="#zeroshot">Zero-shot</a>
+        <a href="#cite">Cite</a>
+      </span>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <div class="container">
+      <h1>DRIFT: Difficulty-aware Rectified Flows for<br>Through-plane MRI Super-Resolution</h1>
+      <div class="venue">ECCV 2026</div>
+
+      <div class="authors">
+        <a href="#">Yoonseok Choi</a><sup>1</sup>,
+        <a href="#">Eun-Gyu Ha</a><sup>1</sup>,
+        <a href="#">Daniel Kim</a><sup>1</sup>,
+        <a href="#">Mohammed A. Al-masni</a><sup>2</sup>,
+        <a href="#">Ming-Hsuan Yang</a><sup>3</sup>,
+        <a href="#">Dong-Hyun Kim</a><sup>1,*</sup>
+      </div>
+      <div class="affil">
+        <sup>1</sup>Department of Electrical and Electronic Engineering, Yonsei University, Seoul, Republic of Korea &nbsp;·&nbsp;
+        <sup>2</sup>Department of Bioengineering, KFUPM, Dhahran, Saudi Arabia &nbsp;·&nbsp;
+        <sup>3</sup>EECS, University of California, Merced, USA
+      </div>
+      <div class="corr">* Corresponding author</div>
+
+      <div class="btn-row">
+        <!-- TODO: arXiv link (optional) -->
+        <a class="btn" href="#cite">
+          <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6V2zm8 1.5V8h4.5L14 3.5z"/></svg>
+          Paper
+        </a>
+        <!-- TODO: replace # with GitHub repo URL -->
+        <a class="btn" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.11.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.79 2.73 1.27 3.4.97.1-.76.41-1.27.74-1.56-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.25 5.68.42.36.8 1.08.8 2.18v3.23c0 .31.21.68.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+          Code
+        </a>
+        <!-- TODO: replace # with video/demo link -->
+        <a class="btn" href="#demo">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          Video
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== TEASER ===== -->
+  <section style="border-top:none; padding-top:8px;">
+    <div class="container">
+      <figure>
+        <img src="static/images/fig_drift_test_concept.png" alt="DRIFT concept: two-stage pipeline and Adaptive Integration Scheduler">
+        <figcaption>
+          <strong>(a)</strong> DRIFT reconstructs high-resolution through-plane detail in two stages &mdash;
+          Structural Manifold Projection (APN) followed by a Difficulty-Aware Rectified Flow &mdash;
+          avoiding the long sampling of conventional diffusion.
+          <strong>(b)</strong> An Adaptive Integration Scheduler spends more steps on harder regions (higher PAD) and fewer on easy ones.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ===== ABSTRACT ===== -->
+  <section id="abstract" class="abstract">
+    <div class="container">
+      <h2>Abstract</h2>
+      <p>
+        Magnetic Resonance Imaging (MRI) is often acquired with anisotropic resolution to reduce scan time,
+        producing stair-step artifacts along the through-plane direction. In through-plane MRI super-resolution,
+        an efficiency&ndash;fidelity trade-off arises: feed-forward regressors are fast but oversmooth at large
+        slice-thicknesses, while sampling-based methods improve fidelity at high inference cost. We propose
+        <strong>DRIFT</strong>, a two-stage thickness-conditioned rectified flow framework for through-plane MRI
+        super-resolution with continuous input slice-thickness. <strong>Stage&nbsp;1</strong> employs an
+        Anatomical Projection Network (APN) to map low-resolution patches to a coarse high-resolution manifold,
+        providing a deterministic anatomical initialization that shortens the residual transport of Stage&nbsp;2.
+        <strong>Stage&nbsp;2</strong> refines details via rectified flow and introduces a Physics-Aware Difficulty
+        (PAD) metric, derived from the slice-thickness-induced through-plane bandwidth deficit, to guide an
+        Adaptive Integration Scheduler (AIS) that allocates ODE steps by thickness. A Consistent Endpoint
+        Trajectory Alignment (CETA) loss enforces thickness-consistent reconstructions. DRIFT outperforms
+        super-resolution baselines while reducing inference cost.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== KEY CLAIMS ===== -->
+  <section>
+    <div class="container">
+      <h2>Key Contributions</h2>
+      <p class="lead">What makes DRIFT work.</p>
+      <div class="cards">
+        <div class="card">
+          <span class="num">1</span>
+          <h3>Anatomical initialization (APN)</h3>
+          <p>An Anatomical Projection Network maps thick-slice LR patches onto a coarse HR manifold in a single deterministic step, shortening the residual transport the flow must cover.</p>
+        </div>
+        <div class="card">
+          <span class="num">2</span>
+          <h3>Thickness-conditioned rectified flow</h3>
+          <p>A rectified flow refines the coarse prediction, conditioned on continuous input slice-thickness and regularized by a Consistent Endpoint Trajectory Alignment (CETA) loss for thickness-consistent outputs.</p>
+        </div>
+        <div class="card">
+          <span class="num">3</span>
+          <h3>Adaptive compute (PAD &rarr; AIS)</h3>
+          <p>A Physics-Aware Difficulty score, derived from the through-plane bandwidth deficit of each slice-thickness, drives an Adaptive Integration Scheduler that spends more ODE steps on thicker (harder) inputs and fewer on thin ones.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== METHOD ===== -->
+  <section id="method">
+    <div class="container">
+      <h2>Method</h2>
+      <p class="lead">Training pipeline: Shinnar&ndash;Le&nbsp;Roux degradation simulation, structural manifold projection (APN), and a difficulty-aware rectified flow with CETA.</p>
+      <figure>
+        <img src="static/images/fig_drift_train.jpg" alt="DRIFT training architecture">
+        <figcaption>
+          <strong>Stage&nbsp;1</strong> projects LR patches onto a coarse HR manifold via the APN under a slice-thickness condition.
+          <strong>Stage&nbsp;2</strong> trains a rectified flow on the coarse&rarr;HR trajectory, regularized by Consistent Endpoint Trajectory Alignment (CETA).
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ===== DEMO / VIDEO ===== -->
+  <section id="demo">
+    <div class="container">
+      <h2>Demo</h2>
+      <p class="lead">Sweeping through the volume &mdash; thick-slice low-resolution input (left) vs. DRIFT reconstruction to isotropic resolution (right). Each panel is annotated with its acquisition resolution and slice thickness.</p>
+
+      <h3 style="text-align:center;margin-top:24px;">HCP &mdash; sagittal (T1)</h3>
+      <div class="vgrid">
+        <figure>
+          <span class="tag sim">HCP &middot; &times;8</span>
+          <video controls autoplay muted loop playsinline>
+            <source src="static/videos/demo_hcp.mp4" type="video/mp4">
+          </video>
+          <figcaption>0.7&nbsp;mm in-plane &times; 5.6&nbsp;mm slice &rarr; 0.7&nbsp;mm isotropic.</figcaption>
+        </figure>
+        <figure>
+          <span class="tag sim">HCP &middot; &times;6</span>
+          <video controls autoplay muted loop playsinline>
+            <source src="static/videos/demo_hcp_x6.mp4" type="video/mp4">
+          </video>
+          <figcaption>0.7&nbsp;mm in-plane &times; 4.2&nbsp;mm slice &rarr; 0.7&nbsp;mm isotropic.</figcaption>
+        </figure>
+      </div>
+
+      <h3 style="text-align:center;margin-top:30px;">IDEAS &mdash; coronal (T1)</h3>
+      <div class="vgrid">
+        <figure>
+          <span class="tag sim">IDEAS &middot; &times;6</span>
+          <video controls autoplay muted loop playsinline>
+            <source src="static/videos/demo_ideas.mp4" type="video/mp4">
+          </video>
+          <figcaption>1.0&nbsp;mm in-plane &times; 6.0&nbsp;mm slice &rarr; 1.0&nbsp;mm isotropic.</figcaption>
+        </figure>
+        <figure>
+          <span class="tag sim">IDEAS &middot; &times;4</span>
+          <video controls autoplay muted loop playsinline>
+            <source src="static/videos/demo_ideas_x4.mp4" type="video/mp4">
+          </video>
+          <figcaption>1.0&nbsp;mm in-plane &times; 4.0&nbsp;mm slice &rarr; 1.0&nbsp;mm isotropic.</figcaption>
+        </figure>
+      </div>
+
+      <h3 style="text-align:center;margin-top:30px;">MIND &mdash; coronal (T2)</h3>
+      <div class="vgrid">
+        <figure>
+          <span class="tag sim">MIND &middot; &times;6</span>
+          <video controls autoplay muted loop playsinline>
+            <source src="static/videos/demo_mind.mp4" type="video/mp4">
+          </video>
+          <figcaption>0.9&nbsp;mm in-plane &times; 5.4&nbsp;mm slice &rarr; 0.9&nbsp;mm isotropic.</figcaption>
+        </figure>
+        <figure>
+          <span class="tag sim">MIND &middot; &times;4</span>
+          <video controls autoplay muted loop playsinline>
+            <source src="static/videos/demo_mind_x4.mp4" type="video/mp4">
+          </video>
+          <figcaption>0.9&nbsp;mm in-plane &times; 3.6&nbsp;mm slice &rarr; 0.9&nbsp;mm isotropic.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMPARE (before/after slider) ===== -->
+  <section id="compare">
+    <div class="container">
+      <h2>Drag to compare</h2>
+      <p class="lead">Drag the handle across the image. Switch the dataset and the comparison below.</p>
+
+      <div class="pills">
+        <span class="pill-group">
+          <button class="pill active" data-dataset="hcp">HCP &times;8</button>
+          <button class="pill" data-dataset="ideas">IDEAS &times;6</button>
+          <button class="pill" data-dataset="mind">MIND &times;6</button>
+        </span>
+        <span class="pill-group">
+          <button class="pill active" data-mode="lr">LR vs DRIFT</button>
+          <button class="pill" data-mode="gt">DRIFT vs GT</button>
+        </span>
+      </div>
+
+      <div class="ba-slider">
+        <div class="ba-before"><img src="static/images/slider/hcp_lr.png" alt="before"><span class="ba-lab">LR input</span></div>
+        <div class="ba-after"><img src="static/images/slider/hcp_drift.png" alt="after"><span class="ba-lab">DRIFT</span></div>
+        <div class="ba-handle"></div>
+      </div>
+      <p class="lead" style="margin-top:16px;">In <em>DRIFT vs GT</em> mode, the reconstruction is nearly indistinguishable from the isotropic ground truth.</p>
+    </div>
+  </section>
+
+  <!-- ===== RESULTS ===== -->
+  <section id="results">
+    <div class="container">
+      <h2>Results</h2>
+
+      <!-- metric callouts -->
+      <div class="metrics">
+        <div class="metric"><div class="v">+3.54 dB</div><div class="k">PSNR over best baseline (HCP)</div></div>
+        <div class="metric"><div class="v">0.043</div><div class="k">LPIPS @ ~20 s/volume (HCP &times;8)</div></div>
+        <div class="metric"><div class="v">8&ndash;13</div><div class="k">Adaptive NFEs (&times;2&ndash;&times;8)</div></div>
+      </div>
+
+      <!-- qualitative gallery with tabs -->
+      <h3 style="text-align:center;margin-top:8px;">Qualitative comparison</h3>
+      <div class="pills" data-tabgroup="gallery">
+        <span class="pill-group">
+          <button class="pill active" data-tab="gallery" data-target="fixed">Fixed-scale</button>
+          <button class="pill" data-tab="gallery" data-target="arbitrary">Arbitrary-scale</button>
+        </span>
+      </div>
+      <figure data-panel="gallery" data-name="fixed">
+        <img src="static/images/fig_gallery_fixed.jpg" alt="Fixed-scale qualitative comparison on HCP, MIND, IDEAS">
+        <figcaption>Fixed-scale SR on HCP (green), MIND (yellow), IDEAS (white). DRIFT best preserves anatomy and suppresses stair-step artifacts vs. SwinIR, AFCM, ResShift, and TPDM.</figcaption>
+      </figure>
+      <figure data-panel="gallery" data-name="arbitrary" class="hidden">
+        <img src="static/images/fig_gallery_arbitrary.jpg" alt="Arbitrary-scale qualitative comparison">
+        <figcaption>Arbitrary-scale SR under continuous thickness, including the out-of-distribution 6.5&nbsp;mm. DRIFT stays most consistent with ground truth while INR baselines blur or retain stair-step artifacts.</figcaption>
+      </figure>
+
+      <h3 style="text-align:center;margin-top:36px;">Multi-planar consistency</h3>
+      <figure>
+        <img src="static/images/fig_multiplane.jpg" alt="Multi-planar reformatted views">
+        <figcaption>Although DRIFT is slice-wise, deterministic APN initialization yields coherent reformatted views with low through-plane gradient error.</figcaption>
+      </figure>
+
+      <!-- quantitative plots -->
+      <h3 style="text-align:center;margin-top:36px;">Efficiency vs. accuracy</h3>
+      <div class="grid2">
+        <figure>
+          <img src="static/images/fig_runtime_accuracy.png" alt="PSNR vs runtime">
+          <figcaption>PSNR vs. runtime per volume. DRIFT (&#9733;) reaches the highest PSNR at a fraction of the runtime of diffusion / INR baselines.</figcaption>
+        </figure>
+        <figure>
+          <img src="static/images/fig_runtime_lpips.png" alt="LPIPS vs runtime">
+          <figcaption>LPIPS vs. runtime per volume.</figcaption>
+        </figure>
+      </div>
+
+      <h3 style="text-align:center;margin-top:36px;">Ablation: CETA weight &lambda;<sub>CETA</sub></h3>
+      <figure>
+        <img src="static/images/fig_rebuttal_ceta_weights.png" alt="Ablation on CETA weight across slice thickness">
+        <figcaption>PSNR / SSIM / LPIPS vs. &lambda;<sub>CETA</sub> across slice-thickness regimes (1.5&nbsp;mm easy, 3.0&nbsp;mm normal, 5.0&nbsp;mm hard); &lambda;<sub>CETA</sub>&nbsp;=&nbsp;1.0 is consistently optimal.</figcaption>
+      </figure>
+
+      <h3 style="text-align:center;margin-top:36px;">Downstream segmentation</h3>
+      <div class="metrics">
+        <div class="metric"><div class="v">0.910</div><div class="k">DRIFT Dice</div></div>
+        <div class="metric"><div class="v">0.816</div><div class="k">SA-INR Dice</div></div>
+        <div class="metric"><div class="v">0.801 / 0.772</div><div class="k">TPDM / ArSSR Dice</div></div>
+      </div>
+      <figure>
+        <img src="static/images/fig_downstream_seg.jpg" alt="Downstream SynthSeg segmentation comparison on HCP x8">
+        <figcaption>SynthSeg applied to HCP T1w reconstructions (&times;8), with Dice computed against the HR reference. DRIFT preserves anatomical boundaries most consistently in the reformatted view, translating its through-plane gains into segmentation accuracy.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ===== ZERO-SHOT ===== -->
+  <section id="zeroshot">
+    <div class="container">
+      <h2>Zero-shot on real thick-slice MRI</h2>
+      <p class="lead">Applied to real clinical scans <em>without retraining or fine-tuning</em> &mdash; no isotropic ground truth available.</p>
+
+      <figure>
+        <img src="static/images/fig_zeroshot_inhouse.jpg" alt="Zero-shot reconstruction on in-house clinical scans">
+        <figcaption>In-house 3&nbsp;T scans (5&nbsp;mm slice): FLAIR with IDEAS-pretrained weights, T2w with HCP-pretrained weights. DRIFT reduces stair-step artifacts and preserves anatomical continuity in reformatted views.</figcaption>
+      </figure>
+
+      <figure style="margin-top:22px;">
+        <img src="static/images/fig_zeroshot_fastmri.jpg" alt="Zero-shot comparison on fastMRI vs BME-X foundation model">
+        <figcaption>fastMRI clinical T2w (5&nbsp;mm), HCP-pretrained DRIFT vs. the BME-X foundation model. DRIFT yields sharper coronal reformats &mdash; sharpness 0.291 vs. 0.238, NIQE 5.30 vs. 7.22, BRISQUE 21.16 vs. 62.46.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ===== BIBTEX ===== -->
+  <section id="cite">
+    <div class="container">
+      <h2>BibTeX</h2>
+      <pre class="bibtex"><code>@inproceedings{choi2026drift,
+  title     = {DRIFT: Difficulty-aware Rectified Flows for Through-plane MRI Super-Resolution},
+  author    = {Choi, Yoonseok and Ha, Eun-Gyu and Kim, Daniel and
+               Al-masni, Mohammed A. and Yang, Ming-Hsuan and Kim, Dong-Hyun},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  year      = {2026}
+}</code></pre>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      Page template adapted for DRIFT. &nbsp;·&nbsp; ECCV 2026.
+    </div>
+  </footer>
+
+</body>
+</html>
