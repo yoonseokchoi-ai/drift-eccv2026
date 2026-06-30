@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://yoonseokchoi-ai.github.io/drift-eccv2026/sitemap.xml
