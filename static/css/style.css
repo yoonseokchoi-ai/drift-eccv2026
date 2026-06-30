@@ -56,7 +56,13 @@ header.hero { padding: 64px 0 36px; text-align: center; }
 .authors { font-size: 1.06rem; margin: 4px 0; }
 .authors a { color: var(--fg); }
 .authors sup { color: var(--accent); }
-.affil { color: var(--fg-soft); font-size: .92rem; margin: 10px auto 0; max-width: 760px; }
+.affil { color: var(--fg-soft); font-size: .92rem; margin: 10px auto 0; max-width: 820px; }
+.affil .aff-item { display: inline-block; white-space: nowrap; }
+.affil .aff-sep { margin: 0 6px; opacity: .6; }
+@media (max-width: 720px){
+  .affil .aff-item { display: block; white-space: normal; margin: 2px 0; }
+  .affil .aff-sep { display: none; }
+}
 .corr { color: var(--fg-soft); font-size: .82rem; margin-top: 6px; }
 
 .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
