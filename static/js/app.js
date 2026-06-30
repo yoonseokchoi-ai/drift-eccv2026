@@ -30,27 +30,15 @@ function initCompare() {
   if (!sec) return;
   const beforeImg = sec.querySelector(".ba-before img");
   const afterImg = sec.querySelector(".ba-after img");
-  const beforeLab = sec.querySelector(".ba-before .ba-lab");
-  const afterLab = sec.querySelector(".ba-after .ba-lab");
-  let dataset = "hcp", mode = "lr"; // mode: lr (LR vs DRIFT) | gt (DRIFT vs GT)
+  let dataset = "hcp";
   const base = "static/images/slider/";
   const update = () => {
-    if (mode === "lr") {
-      beforeImg.src = `${base}${dataset}_lr.png`;  beforeLab.textContent = "LR input";
-      afterImg.src  = `${base}${dataset}_drift.png`; afterLab.textContent = "DRIFT";
-    } else {
-      beforeImg.src = `${base}${dataset}_drift.png`; beforeLab.textContent = "DRIFT";
-      afterImg.src  = `${base}${dataset}_gt.png`;     afterLab.textContent = "Ground truth";
-    }
+    beforeImg.src = `${base}${dataset}_lr.png`;
+    afterImg.src  = `${base}${dataset}_drift.png`;
   };
   sec.querySelectorAll("[data-dataset]").forEach(b => b.addEventListener("click", () => {
     dataset = b.dataset.dataset;
     sec.querySelectorAll("[data-dataset]").forEach(x => x.classList.toggle("active", x === b));
-    update();
-  }));
-  sec.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => {
-    mode = b.dataset.mode;
-    sec.querySelectorAll("[data-mode]").forEach(x => x.classList.toggle("active", x === b));
     update();
   }));
   update();

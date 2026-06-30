@@ -215,7 +215,7 @@
   <section id="compare">
     <div class="container">
       <h2>Drag to compare</h2>
-      <p class="lead">Drag the handle across the image. Switch the dataset and the comparison below.</p>
+      <p class="lead">Drag the handle: thick-slice LR input on the left, DRIFT reconstruction on the right. Switch the dataset below.</p>
 
       <div class="pills">
         <span class="pill-group">
@@ -223,18 +223,13 @@
           <button class="pill" data-dataset="ideas">IDEAS &times;6</button>
           <button class="pill" data-dataset="mind">MIND &times;6</button>
         </span>
-        <span class="pill-group">
-          <button class="pill active" data-mode="lr">LR vs DRIFT</button>
-          <button class="pill" data-mode="gt">DRIFT vs GT</button>
-        </span>
       </div>
 
       <div class="ba-slider">
-        <div class="ba-before"><img src="static/images/slider/hcp_lr.png" alt="before"><span class="ba-lab">LR input</span></div>
-        <div class="ba-after"><img src="static/images/slider/hcp_drift.png" alt="after"><span class="ba-lab">DRIFT</span></div>
+        <div class="ba-before"><img src="static/images/slider/hcp_lr.png" alt="LR input"><span class="ba-lab">LR input</span></div>
+        <div class="ba-after"><img src="static/images/slider/hcp_drift.png" alt="DRIFT"><span class="ba-lab">DRIFT</span></div>
         <div class="ba-handle"></div>
       </div>
-      <p class="lead" style="margin-top:16px;">In <em>DRIFT vs GT</em> mode, the reconstruction is nearly indistinguishable from the isotropic ground truth.</p>
     </div>
   </section>
 
